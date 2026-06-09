@@ -39,13 +39,14 @@ import {
   Typography,
   theme,
 } from 'antd';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text } = Typography;
 const { useBreakpoint } = Grid;
 
-const navKeys = ['home', 'work', 'solutions', 'products', 'qa', 'about', 'contact'];
+const navKeys = ['home', 'work', 'solutions', 'knowledge', 'products', 'qa', 'about', 'contact'];
+const KNOWLEDGE_CSV_PATH = '/knowledge/uploads/knowledge.csv';
 
 const copy = {
   th: {
@@ -53,6 +54,7 @@ const copy = {
       home: 'หน้าแรก',
       work: 'งานของเรา',
       solutions: 'โซลูชัน',
+      knowledge: 'Knowledge Center',
       products: 'สินค้า',
       qa: 'ถาม-ตอบ',
       about: 'เกี่ยวกับเรา',
@@ -78,6 +80,9 @@ const copy = {
     productTitle: 'รายการผลิตภัณฑ์',
     productBody:
       'รายการสินค้าถูกแบ่งตามกลุ่ม Boiler, Cooling, RO และ Clarification พร้อมสรุปหน้าที่ของผลิตภัณฑ์ให้เข้าใจง่ายทั้งฝ่ายวิศวกรรม จัดซื้อ และผู้ให้บริการระบบบำบัดน้ำ',
+    knowledgeTitle: 'Knowledge Center',
+    knowledgeBody:
+      'บทความและความรู้ด้านเคมีบำบัดน้ำถูกดึงจากไฟล์ CSV แล้วแสดงผลเป็นหน้าเดียวตามลำดับข้อมูลในไฟล์',
     qaTitle: 'คำถามที่พบบ่อยจากงานจริง',
     qaBody:
       'คำถามด้าน Conductivity, pH, Boiler, RO Permeate และตะกรันใน Condenser ถูกเรียบเรียงให้ตอบตรงประเด็นและนำไปใช้คุยงานหน้าไซต์ได้ง่าย',
@@ -104,6 +109,7 @@ const copy = {
       home: 'Home',
       work: 'Our Work',
       solutions: 'Solutions',
+      knowledge: 'Knowledge Center',
       products: 'Products',
       qa: 'Q&A',
       about: 'About',
@@ -129,6 +135,9 @@ const copy = {
     productTitle: 'Product List',
     productBody:
       'Products are grouped by boiler, cooling, RO and clarification applications, with concise use summaries for engineers, procurement teams and water treatment service providers.',
+    knowledgeTitle: 'Knowledge Center',
+    knowledgeBody:
+      'Water treatment articles are loaded from a CSV file and displayed as a single page in the same order as the uploaded content.',
     qaTitle: 'Practical Q&A',
     qaBody:
       'Questions about conductivity, pH, boiler water, RO permeate and condenser scale are rewritten into direct, useful answers for site discussions.',
@@ -551,12 +560,134 @@ function SectionHeading({ kicker, title, children }) {
   );
 }
 
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let value = '';
+  let inQuotes = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+
+    if (inQuotes) {
+      if (char === '"' && next === '"') {
+        value += '"';
+        index += 1;
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        value += char;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = true;
+    } else if (char === ',') {
+      row.push(value);
+      value = '';
+    } else if (char === '\n') {
+      row.push(value);
+      rows.push(row);
+      row = [];
+      value = '';
+    } else if (char !== '\r') {
+      value += char;
+    }
+  }
+
+  if (value || row.length) {
+    row.push(value);
+    rows.push(row);
+  }
+
+  return rows.filter((items) => items.some((item) => item.trim()));
+}
+
+function normalizeCsvKey(value) {
+  return value
+    .replace(/^\uFEFF/, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9ก-ฮะ-์]+/gi, '');
+}
+
+function getCsvField(row, aliases) {
+  for (const alias of aliases) {
+    const value = row[normalizeCsvKey(alias)];
+    if (value?.trim()) return value.trim();
+  }
+  return '';
+}
+
+function normalizeImageSource(value) {
+  if (!value) return '';
+  if (/^(https?:)?\/\//i.test(value) || value.startsWith('/')) return value;
+  if (value.includes('/')) return `/${value}`;
+  return `/knowledge/uploads/${value}`;
+}
+
+function csvToKnowledgeItems(text) {
+  const rows = parseCsv(text);
+  const headers = rows.shift()?.map(normalizeCsvKey) ?? [];
+
+  return rows
+    .map((values, index) => {
+      const row = headers.reduce((record, header, headerIndex) => {
+        record[header] = values[headerIndex] ?? '';
+        return record;
+      }, {});
+      const header = getCsvField(row, ['header', 'title', 'หัวข้อ', 'header subject', 'header/subject']);
+      const subject = getCsvField(row, ['subject', 'subtitle', 'sub subject', 'เรื่อง', 'คำอธิบาย']);
+      const body = getCsvField(row, ['body', 'content', 'article', 'รายละเอียด', 'เนื้อหา']);
+      const image = getCsvField(row, ['image', 'link image', 'link image png jpg', 'link image (png/jpg)', 'image url', 'image_url', 'รูปภาพ']);
+
+      return {
+        key: `${index}-${header || subject}`,
+        header,
+        subject,
+        body,
+        image: normalizeImageSource(image),
+      };
+    })
+    .filter((item) => item.header || item.subject || item.body);
+}
+
 function App() {
   const [lang, setLang] = useState('th');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [productGroup, setProductGroup] = useState('all');
+  const [knowledgeItems, setKnowledgeItems] = useState([]);
+  const [knowledgeStatus, setKnowledgeStatus] = useState('loading');
   const screens = useBreakpoint();
   const t = copy[lang];
+
+  useEffect(() => {
+    let active = true;
+
+    fetch(`${KNOWLEDGE_CSV_PATH}?v=${Date.now()}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`CSV request failed with ${response.status}`);
+        }
+        return response.text();
+      })
+      .then((text) => {
+        if (!active) return;
+        setKnowledgeItems(csvToKnowledgeItems(text));
+        setKnowledgeStatus('ready');
+      })
+      .catch(() => {
+        if (!active) return;
+        setKnowledgeItems([]);
+        setKnowledgeStatus('error');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const menuItems = navKeys.map((key) => ({
     key,
@@ -623,13 +754,13 @@ function App() {
       theme={{
         algorithm: theme.defaultAlgorithm,
         token: {
-          colorPrimary: '#0d7c8a',
-          colorInfo: '#1f9bb4',
-          colorSuccess: '#2f855a',
-          colorWarning: '#d97706',
-          colorText: '#17324d',
-          colorTextSecondary: '#5b6b7c',
-          colorBgLayout: '#f6f8fb',
+          colorPrimary: '#0b63bd',
+          colorInfo: '#16b7e8',
+          colorSuccess: '#66b83f',
+          colorWarning: '#0aa8d6',
+          colorText: '#082b66',
+          colorTextSecondary: '#4c6d8c',
+          colorBgLayout: '#f3fbff',
           borderRadius: 8,
           fontFamily:
             '"Segoe UI", "Noto Sans Thai", "Leelawadee UI", Tahoma, Arial, sans-serif',
@@ -638,8 +769,8 @@ function App() {
           Button: { borderRadius: 8, controlHeight: 42 },
           Card: { borderRadiusLG: 8 },
           Menu: {
-            horizontalItemSelectedColor: '#0d7c8a',
-            horizontalItemHoverColor: '#0d7c8a',
+            horizontalItemSelectedColor: '#0b63bd',
+            horizontalItemHoverColor: '#16b7e8',
           },
         },
       }}
@@ -647,9 +778,15 @@ function App() {
       <Layout className="site-layout">
         <Header className="site-header">
           <button className="brand" type="button" onClick={() => scrollToSection('home')} aria-label="CHEMPRO home">
-            <span className="brand-mark">CP</span>
+            <span className="brand-mark" aria-hidden="true">
+              <span className="brand-drop" />
+            </span>
             <span className="brand-text">
-              <strong>CHEMPRO</strong>
+              <small>AQUEOUS</small>
+              <strong>
+                <span>CHEM</span>
+                <em>PRO</em>
+              </strong>
               <small>AQUEOUS CHEMPRO CO., LTD.</small>
             </span>
           </button>
@@ -812,6 +949,53 @@ function App() {
                   </Col>
                 ))}
               </Row>
+            </div>
+          </section>
+
+          <section id="knowledge" className="page-section knowledge-section">
+            <div className="container">
+              <SectionHeading kicker={t.nav.knowledge} title={t.knowledgeTitle}>
+                {t.knowledgeBody}
+              </SectionHeading>
+              {knowledgeStatus === 'loading' ? (
+                <Card className="knowledge-state-card">
+                  <Text>{lang === 'th' ? 'กำลังโหลด Knowledge Center...' : 'Loading Knowledge Center...'}</Text>
+                </Card>
+              ) : null}
+              {knowledgeStatus !== 'loading' && !knowledgeItems.length ? (
+                <Card className="knowledge-state-card">
+                  <Text>
+                    {lang === 'th'
+                      ? 'ยังไม่พบข้อมูล Knowledge Center ในไฟล์ CSV'
+                      : 'No Knowledge Center content was found in the CSV file.'}
+                  </Text>
+                </Card>
+              ) : null}
+              {knowledgeItems.length ? (
+                <div className="knowledge-stream">
+                  {knowledgeItems.map((item, index) => (
+                    <article className="knowledge-entry" key={item.key}>
+                      {item.image ? (
+                        <div className="knowledge-media">
+                          <img
+                            src={item.image}
+                            alt={item.subject || item.header}
+                            onError={(event) => {
+                              event.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      ) : null}
+                      <div className="knowledge-entry-content">
+                        <Tag color="blue">{String(index + 1).padStart(2, '0')}</Tag>
+                        {item.header ? <Title level={3}>{item.header}</Title> : null}
+                        {item.subject ? <Text className="knowledge-subject">{item.subject}</Text> : null}
+                        {item.body ? <Paragraph className="knowledge-body">{item.body}</Paragraph> : null}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </section>
 
