@@ -1,0 +1,487 @@
+:root {
+  color: #17324d;
+  background: #f6f8fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  overflow-x: hidden;
+  background: #f6f8fb;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.site-layout {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #f6f8fb;
+}
+
+.container {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 72px;
+  padding: 0 28px;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(23, 50, 77, 0.1);
+  backdrop-filter: blur(16px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 12px;
+  min-width: 232px;
+  padding: 0;
+  color: #17324d;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #ffffff;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0d7c8a, #2f855a);
+  border-radius: 8px;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+  line-height: 1.1;
+}
+
+.brand small {
+  margin-top: 4px;
+  color: #5b6b7c;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.desktop-nav {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-width: 0;
+}
+
+.desktop-nav .ant-menu {
+  min-width: 640px;
+  justify-content: center;
+  background: transparent;
+  border-bottom: 0;
+}
+
+.header-actions {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  min-width: 210px;
+}
+
+.mobile-menu-button {
+  display: none;
+}
+
+.drawer-contact {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(23, 50, 77, 0.12);
+}
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  padding: 88px 0 72px;
+  background:
+    linear-gradient(115deg, rgba(12, 54, 67, 0.96), rgba(13, 124, 138, 0.86) 54%, rgba(47, 133, 90, 0.8)),
+    url('/assets/hero-background.png') center/cover;
+}
+
+.hero-copy {
+  width: 100%;
+}
+
+.hero-copy .ant-typography,
+.hero-copy .ant-tag {
+  color: #ffffff;
+}
+
+.hero-badge {
+  width: fit-content;
+  padding: 4px 10px;
+  color: #0b4c5a !important;
+  font-weight: 700;
+}
+
+.hero-copy h1.ant-typography {
+  max-width: 760px;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(38px, 5.4vw, 64px);
+  line-height: 1.04;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.hero-subtitle {
+  max-width: 720px;
+  margin: 18px 0 0;
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.hero-description {
+  max-width: 700px;
+  color: rgba(255, 255, 255, 0.84) !important;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.hero-visual {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  box-shadow: 0 30px 90px rgba(4, 27, 37, 0.34);
+}
+
+.hero-visual img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.hero-visual-panel {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 8px;
+  box-shadow: 0 14px 40px rgba(4, 27, 37, 0.18);
+}
+
+.trust-band {
+  padding: 22px 0;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(23, 50, 77, 0.08);
+}
+
+.metric-card,
+.work-card,
+.solution-card,
+.timeline-card,
+.philosophy-card,
+.contact-card {
+  height: 100%;
+  border: 1px solid rgba(23, 50, 77, 0.08);
+  box-shadow: 0 18px 48px rgba(23, 50, 77, 0.06);
+}
+
+.metric-icon,
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  color: #0d7c8a;
+  background: #e7f7f6;
+  border-radius: 8px;
+  font-size: 22px;
+}
+
+.page-section {
+  scroll-margin-top: 84px;
+  padding: 84px 0;
+  background: #f6f8fb;
+}
+
+.section-contrast {
+  background: #ffffff;
+}
+
+.section-heading {
+  max-width: 880px;
+  margin-bottom: 36px;
+}
+
+.section-kicker {
+  color: #0d7c8a;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.section-heading h2.ant-typography {
+  margin: 8px 0 12px;
+  color: #17324d;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.section-heading p.ant-typography {
+  color: #5b6b7c;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.work-card h3.ant-typography,
+.solution-card h3.ant-typography,
+.philosophy-card h3.ant-typography {
+  margin: 0;
+  color: #17324d;
+  font-size: 22px;
+  line-height: 1.28;
+}
+
+.work-card p.ant-typography,
+.solution-card p.ant-typography {
+  margin-bottom: 0;
+  color: #5b6b7c;
+  line-height: 1.72;
+}
+
+.solution-card .ant-card-cover img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+
+.solution-card .ant-list-item,
+.philosophy-card .ant-list-item {
+  padding: 5px 0;
+}
+
+.check-icon {
+  margin-top: 3px;
+  color: #2f855a;
+}
+
+.product-tabs {
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(23, 50, 77, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(23, 50, 77, 0.06);
+}
+
+.product-tabs .ant-table {
+  color: #17324d;
+}
+
+.timeline-card,
+.philosophy-card {
+  min-height: 320px;
+}
+
+.timeline-card .ant-card-body,
+.philosophy-card .ant-card-body {
+  height: 100%;
+}
+
+.contact-section {
+  background:
+    linear-gradient(115deg, rgba(12, 54, 67, 0.95), rgba(13, 124, 138, 0.84)),
+    url('/assets/solution-ro.png') center/cover;
+}
+
+.contact-section .section-kicker,
+.contact-section .section-heading h2.ant-typography,
+.contact-section .section-heading p.ant-typography {
+  color: #ffffff;
+}
+
+.contact-card .ant-descriptions-item-label {
+  width: 160px;
+  font-weight: 700;
+}
+
+.contact-actions {
+  margin-top: 18px;
+}
+
+.site-footer {
+  background: #0c3643;
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.site-footer .ant-typography {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 1100px) {
+  .desktop-nav .ant-menu {
+    min-width: 520px;
+  }
+
+  .brand {
+    min-width: 198px;
+  }
+}
+
+@media (max-width: 991px) {
+  .site-header {
+    padding: 0 18px;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .header-actions {
+    min-width: 0;
+  }
+
+  .header-actions .ant-btn-primary {
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: inline-flex;
+  }
+
+  .hero-section {
+    padding: 56px 0 58px;
+  }
+
+  .hero-copy h1.ant-typography {
+    font-size: 38px;
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .site-header {
+    height: 64px;
+    padding: 0 12px;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 9px;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand small {
+    display: none;
+  }
+
+  .brand strong {
+    font-size: 14px;
+  }
+
+  .page-section {
+    padding: 64px 0;
+  }
+
+  .section-heading {
+    margin-bottom: 28px;
+  }
+
+  .hero-copy h1.ant-typography {
+    font-size: 32px;
+    line-height: 1.14;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+  }
+
+  .hero-description,
+  .section-heading p.ant-typography {
+    font-size: 15px;
+  }
+
+  .hero-visual-panel {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    padding: 12px;
+  }
+
+  .metric-card .ant-card-body {
+    padding: 14px;
+  }
+
+  .metric-icon,
+  .feature-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 19px;
+  }
+
+  .product-tabs {
+    padding: 12px;
+  }
+
+  .contact-card .ant-descriptions-item-label {
+    width: 112px;
+  }
+
+  .footer-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
